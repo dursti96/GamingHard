@@ -5,7 +5,7 @@ class Character(pg.sprite.Sprite):
     def __init__(self, posx, posy, speed_x, speed_y, direction):
         super().__init__()
         self.image = pg.image.load("src\\img\\player_img.png")
-        self.image = pg.transform.scale(self.image, (156, 126)).convert_alpha()
+        self.image = pg.transform.scale(self.image, (310, 256)).convert_alpha()
         self.rect = self.image.get_rect(midbottom=(posx, posy))
         self.speed_x = speed_x
         self.speed_y = speed_y
@@ -43,7 +43,7 @@ class Character(pg.sprite.Sprite):
             if event.key == pg.K_w or event.key == pg.K_s:
                 self.speed_y = 0
 
-    def move_char_rect(self):
+    def move_rect(self):
         self.posx += self.speed_x
         self.posy += self.speed_y
         self.rect.midbottom = (self.posx, self.posy)
