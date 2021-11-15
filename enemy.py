@@ -22,11 +22,11 @@ def get_spawn_pos():
 class EnemyFlyman(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image_org = pg.image.load("src\\img\\flyMan_fly.png")
+        self.image_org = pg.image.load(r"src\img\flyMan_fly.png")
         self.image = pg.transform.scale(self.image_org, (310, 256)).convert_alpha()
         self.posx, self.posy = get_spawn_pos()
 
-        self.rect = self.image.get_rect(midbottom=(self.posx, self.posy))
+        self.rect = self.image.get_rect(topleft=(self.posx, self.posy))
         self.speed = randint(15, 30) / 100
 
     def chase(self, character):
@@ -40,7 +40,7 @@ class EnemyFlyman(pg.sprite.Sprite):
             self.posy += self.speed
         elif self.posy > character.posy:
             self.posy -= self.speed
-        self.rect.midbottom = (self.posx, self.posy)
+        self.rect.topleft = (self.posx, self.posy)
 
 
 

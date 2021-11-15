@@ -1,17 +1,22 @@
 import pygame as pg
 
-
 class Character(pg.sprite.Sprite):
     def __init__(self, posx, posy, speed_x, speed_y, direction):
         super().__init__()
-        self.image_org = pg.image.load("src\\img\\player_img.png")
+        self.image_org = pg.image.load(r"src\img\player_img.png")
         self.image = pg.transform.scale(self.image_org, (310, 256)).convert_alpha()
-        self.rect = self.image.get_rect(midbottom=(posx, posy))
+        self.rect = self.image.get_rect(topleft=(posx, posy))
         self.speed_x = speed_x
         self.speed_y = speed_y
         self.direction = direction
         self.posx = posx
         self.posy = posy
+        self.speed = 0.8
+
+    def update_img_rect(self, screen_height, char_size):
+        self.image = pg.transform.scale(self.image_org, (
+            screen_height * char_size / 1.4, screen_height * char_size)).convert_alpha()
+        self.rect = self.image.get_rect(topleft=(self.posx, self.posy))
 
     def check_out_of_bounds(self, screen_width, screen_height, stats_screen_height, title_bar_height=31):
         if self.rect.left < 0 and self.speed_x < 0:
@@ -27,13 +32,13 @@ class Character(pg.sprite.Sprite):
         # if key is pressed, adjust speed
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_a:
-                self.speed_x += - 0.4
+                self.speed_x += - 1 * self.speed
             if event.key == pg.K_d:
-                self.speed_x += 0.4
+                self.speed_x += 1 * self.speed
             if event.key == pg.K_w:
-                self.speed_y += - 0.4
+                self.speed_y += - 1 * self.speed
             if event.key == pg.K_s:
-                self.speed_y += 0.4
+                self.speed_y += 1 * self.speed
         # if key is released
         if event.type == pg.KEYUP:
             # if a or d released
@@ -46,7 +51,7 @@ class Character(pg.sprite.Sprite):
     def move_rect(self):
         self.posx += self.speed_x * self.rect.width / 100
         self.posy += self.speed_y * self.rect.height / 100
-        self.rect.midbottom = (self.posx, self.posy)
+        self.rect.topleft = (self.posx, self.posy)
 
     def check_direction(self):
         # face right direction; False == face right, True == face left

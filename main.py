@@ -9,8 +9,8 @@ pg.init()
 # create full screen surface
 screen = pg.display.set_mode((1600, 1000))
 # set title, icon
-pg.display.set_caption("GamingHard",)
-icon = pg.image.load("src\\img\\logo.png")
+pg.display.set_caption("GamingHard")
+icon = pg.image.load(r"src\img\logo.png")
 pg.display.set_icon(icon)
 background_rgb = (230, 230, 230)
 
@@ -22,45 +22,36 @@ ig_background_rgb = (255, 255, 0)
 stats_screen = pg.Surface((screen.get_width(), screen.get_height()/8))
 stats_background_rgb = (230, 230, 230)
 
-# define player attributes, resize and convert player img
-standard_pos_x = ingame_screen.get_width() / 2
-standard_pos_y = ingame_screen.get_height() / 1.5
-
 # game_level 0 == menu, game_level 1 == in level
 game_level = 0
 
-standard_x_speed = 0
-standard_y_speed = 0
-# 0 is right
-standard_direction = False
-size = 0.10
-flyman_size = 0.15
-
 # create character
-char = Character(standard_pos_x, standard_pos_y, standard_x_speed, standard_y_speed, standard_direction)
-char.image = pg.transform.scale(char.image_org, (
-            screen.get_height() * size / 1.4, screen.get_height() * size)).convert_alpha()
+standard_pos_x = ingame_screen.get_width() / 2
+standard_pos_y = ingame_screen.get_height() / 1.5
+char = Character(standard_pos_x, standard_pos_y, 0, 0, False)
+char_size = 0.10
+char.update_img_rect(screen.get_height(), char_size)
 
 # create start button
-start_button = Object("src/img/button_start.png", screen.get_width()/2, screen.get_height()/2, 100, 100)
+start_button = Object(r"src/img/button_start.png", screen.get_width()/2, screen.get_height()/2, 100, 100)
 start_button_size = 0.2
 start_button.image = pg.transform.scale(start_button.image, (
         screen.get_width() * 2.1 * start_button_size, screen.get_width() * start_button_size)).convert_alpha()
 
 # create exit button
-exit_button = Object("src/img/button_exit.png", screen.get_width()/2, screen.get_height() / 1.2, 100, 100)
+exit_button = Object(r"src/img/button_exit.png", screen.get_width()/2, screen.get_height() / 1.2, 100, 100)
 exit_button_size = 0.1
 exit_button.image = pg.transform.scale(exit_button.image, (
         screen.get_width() * 2.1 * exit_button_size, screen.get_width() * exit_button_size)).convert_alpha()
 
 # create menu background image
-background_menu_img = pg.image.load("src/img/background_menu.jpg")
+background_menu_img = pg.image.load(r"src/img/background_menu.jpg")
 background_menu_img = pg.transform.scale(background_menu_img, (
         menu_screen.get_height()*2.66, menu_screen.get_height())).convert_alpha()
 
-
-# enemies list
+# enemies
 enemies_list = []
+flyman_size = 0.15
 
 # game loop
 running = True
@@ -93,8 +84,7 @@ while running:
         # if screen size changes
         if event.type == pg.VIDEORESIZE:
             # set char size
-            char.image = pg.transform.scale(char.image_org, (
-            screen.get_height() * size / 1.4, screen.get_height() * size)).convert_alpha()
+            char.update_img_rect(screen.get_height(), char_size)
             # set start button size and position
             start_button.image = pg.transform.scale(start_button.image, (
             screen.get_width() * 2.1 * start_button_size, screen.get_height() * start_button_size)).convert_alpha()
