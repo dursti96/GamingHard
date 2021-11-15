@@ -23,8 +23,8 @@ stats_screen = pg.Surface((screen.get_width(), screen.get_height()/8))
 stats_background_rgb = (230, 230, 230)
 
 # define player attributes, resize and convert player img
-standard_pos_x = ingame_screen.get_width() / 4
-standard_pos_y = ingame_screen.get_height() / 1.3
+standard_pos_x = ingame_screen.get_width() / 2
+standard_pos_y = ingame_screen.get_height() / 1.5
 
 # game_level 0 == menu, game_level 1 == in level
 game_level = 0
