@@ -1,22 +1,25 @@
 import pygame as pg
 
+
 class Character(pg.sprite.Sprite):
-    def __init__(self, posx, posy, speed_x, speed_y, direction):
+    def __init__(self, posx, posy, direction, speed):
         super().__init__()
         self.image_org = pg.image.load(r"src\img\player_img.png")
         self.image = pg.transform.scale(self.image_org, (310, 256)).convert_alpha()
         self.rect = self.image.get_rect(topleft=(posx, posy))
-        self.speed_x = speed_x
-        self.speed_y = speed_y
+        self.mask = pg.mask.from_surface(self.image)
+        self.speed_x = 0
+        self.speed_y = 0
         self.direction = direction
         self.posx = posx
         self.posy = posy
-        self.speed = 0.8
+        self.speed = speed
 
     def update_img_rect(self, screen_height, char_size):
         self.image = pg.transform.scale(self.image_org, (
             screen_height * char_size / 1.4, screen_height * char_size)).convert_alpha()
         self.rect = self.image.get_rect(topleft=(self.posx, self.posy))
+        self.mask = pg.mask.from_surface(self.image)
 
     def check_out_of_bounds(self, screen_width, screen_height, stats_screen_height, title_bar_height=31):
         if self.rect.left < 0 and self.speed_x < 0:
@@ -59,9 +62,11 @@ class Character(pg.sprite.Sprite):
             if not self.direction:
                 self.image = pg.transform.flip(self.image, True, False)
                 self.image_org = pg.transform.flip(self.image_org, True, False)
+                self.mask = pg.mask.from_surface(self.image)
                 self.direction = True
         if self.speed_x > 0:
             if self.direction:
                 self.image = pg.transform.flip(self.image, True, False)
                 self.image_org = pg.transform.flip(self.image_org, True, False)
+                self.mask = pg.mask.from_surface(self.image)
                 self.direction = False
