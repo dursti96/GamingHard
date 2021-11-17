@@ -94,9 +94,6 @@ while running:
             char.change_speed(event)
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                 pos = pg.mouse.get_pos()
-                print(pos)
-                print(char.rect.center)
-                print("-")
                 bullet1_group.add(char.create_bullet1(pos))
         # if in menu, and left mouse is clicked, check if click collides with rect of button
         if game_level == 0:
