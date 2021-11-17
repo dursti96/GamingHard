@@ -104,3 +104,11 @@ class Bullet1(pg.sprite.Sprite):
         self.posx = self.posx + self.direction[0] * self.speed
         self.posy = self.posy + self.direction[1] * self.speed
         self.rect.center = (self.posx, self.posy)
+
+    def check_collision(self, enemy_group):
+        for enemy in enemy_group:
+            if not pg.sprite.collide_mask(self, enemy) is None:
+                if self not in enemy.hit_by:
+                    enemy.hit_by.append(self)
+                    enemy.health -= 1
+

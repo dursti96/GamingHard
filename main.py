@@ -135,6 +135,10 @@ while running:
 
     # ingame lvl 1
     if game_level == 1:
+        # bullet movement and collision
+        for bullet in bullet1_group:
+            bullet.move()
+            bullet.check_collision(enemy_group)
         # spawn enemies
         if len(enemy_group.sprites()) < 5:
             new_enemy = EnemyFlyman()
@@ -142,14 +146,13 @@ while running:
             enemy_group.add(new_enemy)
         # enemy movement and collision
         for enemy in enemy_group:
+            if enemy.health == 0:
+                enemy_group.remove(enemy)
             enemy.chase(char)
             if not pg.sprite.collide_rect(char, enemy) is None:
                 if not pg.sprite.collide_mask(char, enemy) is None:
                     # game_level = "dead"
                     pass
-        # bullet movement and collision
-        for bullet in bullet1_group:
-            bullet.move()
 
         # character functions
         char.check_out_of_bounds(ingame_screen.get_width(), ingame_screen.get_height(), stats_screen.get_height())

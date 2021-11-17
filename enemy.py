@@ -28,6 +28,8 @@ class EnemyFlyman(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=(self.posx, self.posy))
         self.mask = pg.mask.from_surface(self.image)
         self.speed = randint(2, 6) / 10
+        self.health = 3
+        self.hit_by = []
 
     def update_img_rect(self, screen_height, flyman_size):
         self.image = pg.transform.scale(self.image_org, (
