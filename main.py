@@ -87,14 +87,15 @@ while running:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE or event.key == pg.K_ESCAPE:
                     enemy_group.empty()
-                    char = Character(standard_pos_x, standard_pos_y, False, standard_speed)
+                    bullet1_group.empty()
+                    char = Character(standard_pos_x, standard_pos_y, False)
                     char.update_img_rect(screen.get_height(), char_size)
                     game_level = 0
         if game_level == 1:
             # character move, shoot bullet
             char.change_speed(event)
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                if not len(bullet1_group) > 4:
+                if not len(bullet1_group.sprites()) > 4:
                     pos = pg.mouse.get_pos()
                     bullet1_group.add(char.create_bullet1(pos, stats_screen.get_height()))
             for bullet in bullet1_group:
@@ -124,7 +125,7 @@ while running:
                 background_menu_img = pg.transform.scale(background_menu_img, (
                     screen.get_height() * 2.66, screen.get_height())).convert_alpha()
 
-    # death
+    # death screen
     if game_level == "dead":
         img_rect = deathscreen_img.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2))
         screen.blit(deathscreen_img, img_rect)
@@ -142,6 +143,8 @@ while running:
         button_exit_location = menu_screen.blit(exit_button.image, exit_button.rect)
         screen.blit(menu_screen, (0, 0))
 
+    # TODO: enemy shivering when moving along a x or y axis
+    # TODO: add stats(score, max score, show bullets available atm)
     # ingame lvl 1
     if game_level == 1:
         # bullet movement and collision
@@ -155,7 +158,6 @@ while running:
             enemy_group.add(new_enemy)
         # enemy movement and collision
         for enemy in enemy_group:
-            enemy.check_hit_status()
             if enemy.health <= 0:
                 enemy_group.remove(enemy)
             enemy.chase(char)
@@ -170,7 +172,12 @@ while running:
 
         # blit everything
         bullet1_group.draw(ingame_screen)
-        enemy_group.draw(ingame_screen)
+        for enemy in enemy_group:
+            if enemy.hit_status <= 0:
+                ingame_screen.blit(enemy.image, enemy.rect)
+            else:
+                ingame_screen.blit(enemy.image_hit, enemy.rect)
+                enemy.hit_status -= 1
         ingame_screen.blit(char.image, char.rect)
         screen.blit(ingame_screen, (0, screen.get_height() / 8))
         screen.blit(stats_screen, (0, 0))

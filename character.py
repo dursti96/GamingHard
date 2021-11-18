@@ -16,13 +16,13 @@ class Character(pg.sprite.Sprite):
         self.direction = direction
         self.posx = posx
         self.posy = posy
-        self.speed = 4
+        self.speed = 5
 
     def update_img_rect(self, screen_height, char_size):
-            self.image = pg.transform.scale(self.image_org, (
-                screen_height * char_size / 1.4, screen_height * char_size)).convert_alpha()
-            self.rect = self.image.get_rect(center=(self.posx, self.posy))
-            self.mask = pg.mask.from_surface(self.image)
+        self.image = pg.transform.scale(self.image_org, (
+            screen_height * char_size / 1.4, screen_height * char_size)).convert_alpha()
+        self.rect = self.image.get_rect(center=(self.posx, self.posy))
+        self.mask = pg.mask.from_surface(self.image)
 
     def check_out_of_bounds(self, screen_width, screen_height, stats_screen_height, title_bar_height=31):
         if self.rect.left < 0 and self.speed_x < 0:
@@ -112,7 +112,7 @@ class Bullet1(pg.sprite.Sprite):
                 if self not in enemy.hit_by:
                     enemy.hit_by.append(self)
                     enemy.health -= 1
-                    enemy.hit_status = True
+                    enemy.hit_status = 5
 
     def check_out_of_bounds(self, bullet1_group, screen_rect):
         if not screen_rect.contains(self.rect):

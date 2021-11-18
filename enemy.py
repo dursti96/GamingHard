@@ -25,7 +25,8 @@ class EnemyFlyman(pg.sprite.Sprite):
         super().__init__()
         self.image_org = pg.image.load(r"src/img/flyMan_fly.png")
         self.image = pg.transform.scale(self.image_org, (310, 256)).convert_alpha()
-        self.image_saved = self.image
+        self.image_hit_org = pg.image.load(r"src/img/flyMan_jump.png")
+        self.image_hit = pg.transform.scale(self.image_hit_org, (310, 256)).convert_alpha()
         self.posx, self.posy = get_spawn_pos()
         self.rect = self.image.get_rect(center=(self.posx, self.posy))
         self.mask = pg.mask.from_surface(self.image)
@@ -34,19 +35,10 @@ class EnemyFlyman(pg.sprite.Sprite):
         self.hit_by = []
         self.hit_status = 0
 
-    def check_hit_status(self):
-        if self.hit_status == 5:
-            brighten = 10000
-            self.image.fill((brighten, brighten, brighten), special_flags=pg.BLEND_RGB_ADD)
-        if self.hit_status > 0:
-            if self.hit_status == 1:
-                self.image = self.image_saved
-            self.hit_status -= 1
-
     def update_img_rect(self, screen_height, flyman_size):
         self.image = pg.transform.scale(self.image_org, (
             screen_height * flyman_size / 1.14, screen_height * flyman_size)).convert_alpha()
-        self.image_saved = pg.transform.scale(self.image_org, (
+        self.image_hit = pg.transform.scale(self.image_hit_org, (
             screen_height * flyman_size / 1.14, screen_height * flyman_size)).convert_alpha()
         self.rect = self.image.get_rect(center=(self.posx, self.posy))
         self.mask = pg.mask.from_surface(self.image)
