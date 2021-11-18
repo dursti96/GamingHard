@@ -1,12 +1,13 @@
 import math
+import time
 
 import pygame as pg
 
 
 class Character(pg.sprite.Sprite):
-    def __init__(self, posx, posy, direction, speed):
+    def __init__(self, posx, posy, direction):
         super().__init__()
-        self.image_org = pg.image.load(r"src\img\player_img.png")
+        self.image_org = pg.image.load(r"src/img/player_img.png")
         self.image = pg.transform.scale(self.image_org, (310, 256)).convert_alpha()
         self.rect = self.image.get_rect(center=(posx, posy))
         self.mask = pg.mask.from_surface(self.image)
@@ -15,7 +16,7 @@ class Character(pg.sprite.Sprite):
         self.direction = direction
         self.posx = posx
         self.posy = posy
-        self.speed = speed
+        self.speed = 4
 
     def update_img_rect(self, screen_height, char_size):
             self.image = pg.transform.scale(self.image_org, (
@@ -73,10 +74,10 @@ class Character(pg.sprite.Sprite):
                 self.mask = pg.mask.from_surface(self.image)
                 self.direction = False
 
-    def create_bullet1(self, pos_mouse):
+    def create_bullet1(self, pos_mouse, height):
         charx = self.rect.center[0]
         chary = self.rect.center[1]
-        direction = (pos_mouse[0] - charx, pos_mouse[1] - chary)
+        direction = (pos_mouse[0] - charx, pos_mouse[1] - chary - height)
         length = math.hypot(*direction)
         if length == 0.0:
             direction = (0, -1)
@@ -90,7 +91,7 @@ class Bullet1(pg.sprite.Sprite):
     def __init__(self, posx, posy, direction):
         super().__init__()
         self.angle = math.degrees(math.atan2(direction[1], direction[0]))
-        self.image_org = pg.image.load(r"src\img\player_bullet.png")
+        self.image_org = pg.image.load(r"src/img/player_bullet.png")
         self.image_scaled = pg.transform.scale(self.image_org, (100, 65)).convert_alpha()
         self.image = pg.transform.rotate(self.image_scaled, 360 - self.angle).convert_alpha()
         self.rect = self.image.get_rect(center=(posx, posy))
@@ -98,7 +99,7 @@ class Bullet1(pg.sprite.Sprite):
         self.direction = direction
         self.posx = posx
         self.posy = posy
-        self.speed = 2
+        self.speed = 6
 
     def move(self):
         self.posx = self.posx + self.direction[0] * self.speed
@@ -111,4 +112,9 @@ class Bullet1(pg.sprite.Sprite):
                 if self not in enemy.hit_by:
                     enemy.hit_by.append(self)
                     enemy.health -= 1
+                    enemy.hit_status = True
+
+    def check_out_of_bounds(self, bullet1_group, screen_rect):
+        if not screen_rect.contains(self.rect):
+            bullet1_group.remove(self)
 

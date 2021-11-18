@@ -5,10 +5,10 @@ from enemy import EnemyFlyman
 from objects import Object
 
 # create full screen surface
-screen = pg.display.set_mode((1600, 1000))
+screen = pg.display.set_mode((1200, 800))
 # set title, icon
 pg.display.set_caption("GamingHard")
-icon = pg.image.load(r"src\img\logo.png")
+icon = pg.image.load(r"src/img/logo.png")
 pg.display.set_icon(icon)
 background_rgb = (230, 230, 230)
 
@@ -26,8 +26,7 @@ game_level = 0
 # create character
 standard_pos_x = ingame_screen.get_width() / 2
 standard_pos_y = ingame_screen.get_height() / 1.5
-standard_speed = 2
-char = Character(standard_pos_x, standard_pos_y, False, standard_speed)
+char = Character(standard_pos_x, standard_pos_y, False)
 char_size = 0.10
 char.update_img_rect(screen.get_height(), char_size)
 # add char to group_single
@@ -57,6 +56,7 @@ deathscreen_img = pg.image.load(r"src/img/deathscreen.jpg")
 deathscreen_img = pg.transform.scale(deathscreen_img, (
     menu_screen.get_height() * 1.77, menu_screen.get_height())).convert_alpha()
 
+
 # enemies
 flyman_size = 0.15
 enemy_group = pg.sprite.Group()
@@ -68,8 +68,8 @@ running = True
 clock = pg.time.Clock()
 while running:
 
-    # FPS = 60
-    clock.tick(60)
+    # FPS = 30
+    clock.tick(30)
 
     # if screen size is altered
     ingame_screen = pg.Surface((screen.get_width(), screen.get_height() / 8 * 7))
@@ -84,17 +84,21 @@ while running:
         if event.type == pg.QUIT:
             running = False
         if game_level == "dead":
-            if event.type == pg.K_SPACE or event.type == pg.K_ESCAPE:
-                enemy_group.empty()
-                char = Character(standard_pos_x, standard_pos_y, False, standard_speed)
-                char.update_img_rect(screen.get_height(), char_size)
-                game_level = 0
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_SPACE or event.key == pg.K_ESCAPE:
+                    enemy_group.empty()
+                    char = Character(standard_pos_x, standard_pos_y, False, standard_speed)
+                    char.update_img_rect(screen.get_height(), char_size)
+                    game_level = 0
         if game_level == 1:
             # character move, shoot bullet
             char.change_speed(event)
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                pos = pg.mouse.get_pos()
-                bullet1_group.add(char.create_bullet1(pos))
+                if not len(bullet1_group) > 4:
+                    pos = pg.mouse.get_pos()
+                    bullet1_group.add(char.create_bullet1(pos, stats_screen.get_height()))
+            for bullet in bullet1_group:
+                bullet.check_out_of_bounds(bullet1_group, ingame_screen.get_rect())
         # if in menu, and left mouse is clicked, check if click collides with rect of button
         if game_level == 0:
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
@@ -122,7 +126,12 @@ while running:
 
     # death
     if game_level == "dead":
-        screen.blit(deathscreen_img, (0, 0))
+        img_rect = deathscreen_img.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2))
+        screen.blit(deathscreen_img, img_rect)
+        font = pg.font.SysFont('Comic Sans MS', 30)
+        deathscreen_text = font.render('Press "SPACE" to continue.', False, (255, 255, 255))
+        text_rect = deathscreen_text.get_rect(center=(screen.get_width() / 2, screen.get_height() / 1.2))
+        screen.blit(deathscreen_text, text_rect)
 
     # menu
     if game_level == 0:
@@ -146,13 +155,13 @@ while running:
             enemy_group.add(new_enemy)
         # enemy movement and collision
         for enemy in enemy_group:
-            if enemy.health == 0:
+            enemy.check_hit_status()
+            if enemy.health <= 0:
                 enemy_group.remove(enemy)
             enemy.chase(char)
             if not pg.sprite.collide_rect(char, enemy) is None:
                 if not pg.sprite.collide_mask(char, enemy) is None:
-                    # game_level = "dead"
-                    pass
+                    game_level = "dead"
 
         # character functions
         char.check_out_of_bounds(ingame_screen.get_width(), ingame_screen.get_height(), stats_screen.get_height())
