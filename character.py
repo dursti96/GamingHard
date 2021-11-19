@@ -1,5 +1,4 @@
 import math
-import time
 
 import pygame as pg
 
@@ -17,6 +16,9 @@ class Character(pg.sprite.Sprite):
         self.posx = posx
         self.posy = posy
         self.speed = 5
+        self.energy = 5
+        self.energy_loading = False
+        self.energy_loading_time = 0
 
     def update_img_rect(self, screen_height, char_size):
         self.image = pg.transform.scale(self.image_org, (
@@ -83,8 +85,33 @@ class Character(pg.sprite.Sprite):
             direction = (0, -1)
         else:
             direction = (direction[0] / length, direction[1] / length)
-
+        self.energy -= 1
         return Bullet1(charx, chary, direction)
+
+    def update_energy(self):
+        if self.energy < 5 and self.energy_loading is False:
+            self.energy_loading = True
+            self.energy_loading_time = 30
+        if self.energy_loading is True:
+            if self.energy_loading_time >= 0:
+                self.energy_loading_time -= 1
+            else:
+                self.energy += 1
+                self.energy_loading = False
+
+    def update_energy_img(self, energy_group, energy_full, energy_empty):
+        energy_group.empty()
+        empty_energy_count = 5 - self.energy
+        for energy in range(0, self.energy):
+            energy_group.add(energy_full)
+        for energy in range(0, empty_energy_count):
+            energy_group.add(energy_empty)
+
+        offset = 80
+        offset_counter = 0
+        for energy in energy_group:
+            energy.rect = energy.image.get_rect(center=(energy.rect.center[0] + offset * offset_counter, energy.rect.center[1]))
+            offset_counter += 1
 
 
 class Bullet1(pg.sprite.Sprite):
@@ -102,8 +129,8 @@ class Bullet1(pg.sprite.Sprite):
         self.speed = 6
 
     def move(self):
-        self.posx = self.posx + self.direction[0] * self.speed
-        self.posy = self.posy + self.direction[1] * self.speed
+        self.posx += self.direction[0] * self.speed
+        self.posy += self.direction[1] * self.speed
         self.rect.center = (self.posx, self.posy)
 
     def check_collision(self, enemy_group):

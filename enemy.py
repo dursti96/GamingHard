@@ -1,4 +1,3 @@
-import time
 from random import randint
 
 import pygame as pg
@@ -45,14 +44,14 @@ class EnemyFlyman(pg.sprite.Sprite):
 
     def chase(self, character):
         # move along x
-        if self.posx > character.posx:
+        if self.posx > character.posx + 1:
             self.posx -= self.speed
-        elif self.posx < character.posx:
+        elif self.posx < character.posx - 1:
             self.posx += self.speed
         # move along y
-        if self.posy < character.posy:
+        if self.posy < character.posy - 1:
             self.posy += self.speed
-        elif self.posy > character.posy:
+        elif self.posy > character.posy + 1:
             self.posy -= self.speed
         self.rect.center = (self.posx, self.posy)
 

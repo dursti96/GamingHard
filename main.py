@@ -56,6 +56,14 @@ deathscreen_img = pg.image.load(r"src/img/deathscreen.jpg")
 deathscreen_img = pg.transform.scale(deathscreen_img, (
     menu_screen.get_height() * 1.77, menu_screen.get_height())).convert_alpha()
 
+# create energy sprites
+energy_size = 50
+energy_full = Object(r"src/img/energy.png",
+    stats_screen.get_width() / 2, stats_screen.get_height() / 2, energy_size, energy_size)
+energy_empty = Object(r"src/img/energy_empty.png",
+    stats_screen.get_width() / 2, stats_screen.get_height() / 2, energy_size, energy_size)
+energy_group = pg.sprite.Group()
+
 
 # enemies
 flyman_size = 0.15
@@ -95,7 +103,7 @@ while running:
             # character move, shoot bullet
             char.change_speed(event)
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                if not len(bullet1_group.sprites()) > 4:
+                if char.energy > 0:
                     pos = pg.mouse.get_pos()
                     bullet1_group.add(char.create_bullet1(pos, stats_screen.get_height()))
             for bullet in bullet1_group:
@@ -143,10 +151,18 @@ while running:
         button_exit_location = menu_screen.blit(exit_button.image, exit_button.rect)
         screen.blit(menu_screen, (0, 0))
 
-    # TODO: enemy shivering when moving along a x or y axis
-    # TODO: add stats(score, max score, show bullets available atm)
+    # TODO: normalize enemy movement
+    # TODO: add stats(score, max score)
+    # TODO: fix energy blit
     # ingame lvl 1
     if game_level == 1:
+        # reset energy rect
+        energy_full.rect = energy_full.image.get_rect(
+            center=(stats_screen.get_width() / 2, stats_screen.get_height() / 2))
+        energy_empty.rect = energy_empty.image.get_rect(
+            center=(stats_screen.get_width() / 2, stats_screen.get_height() / 2))
+        char.update_energy()
+        char.update_energy_img(energy_group, energy_full, energy_empty)
         # bullet movement and collision
         for bullet in bullet1_group:
             bullet.move()
@@ -180,6 +196,7 @@ while running:
                 enemy.hit_status -= 1
         ingame_screen.blit(char.image, char.rect)
         screen.blit(ingame_screen, (0, screen.get_height() / 8))
+        energy_group.draw(stats_screen)
         screen.blit(stats_screen, (0, 0))
 
     # update screen
