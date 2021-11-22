@@ -164,7 +164,10 @@ while running:
         # bullet movement and collision
         for bullet in bullet1_group:
             bullet.move()
+            death_count_prior = bullet.death_count
             bullet.check_collision(enemy_group)
+            for deaths in range(death_count_prior, bullet.death_count):
+                char.score += 100 * (deaths + 1)
         # spawn enemies
         if len(enemy_group.sprites()) < 5:
             new_enemy = EnemyFlyman()
@@ -172,8 +175,6 @@ while running:
             enemy_group.add(new_enemy)
         # enemy movement and collision
         for enemy in enemy_group:
-            if enemy.health <= 0:
-                enemy_group.remove(enemy)
             enemy.chase(char)
             if not pg.sprite.collide_rect(char, enemy) is None:
                 if not pg.sprite.collide_mask(char, enemy) is None:
@@ -184,14 +185,21 @@ while running:
         char.check_direction()
         char.move_rect()
 
-        # blit everything
+        # blit score
+        font = pg.font.SysFont('Comic Sans MS', 32)
+        score_text = font.render("Score: " + str(char.score), False, (0, 0, 0))
+        score_text_rect = score_text.get_rect(center=(stats_screen.get_width() / 5, stats_screen.get_height() / 2))
+        stats_screen.blit(score_text, score_text_rect)
+        # blit bullets
         bullet1_group.draw(ingame_screen)
+        # blit enemies
         for enemy in enemy_group:
             if enemy.hit_status <= 0:
                 ingame_screen.blit(enemy.image, enemy.rect)
             else:
                 ingame_screen.blit(enemy.image_hit, enemy.rect)
                 enemy.hit_status -= 1
+        # blit screens
         ingame_screen.blit(char.image, char.rect)
         screen.blit(ingame_screen, (0, screen.get_height() / 8))
         energy_group.draw(stats_screen)
