@@ -102,8 +102,10 @@ class Character(pg.sprite.Sprite):
     def update_energy_img(self, energy_group, energy_full, energy_empty):
         energy_group.empty()
         empty_energy_count = 5 - self.energy
-        for energy in range(0, self.energy):
+        energy_count = self.energy
+        while energy_count > 0:
             energy_group.add(energy_full)
+            energy_count -= 1
         for energy in range(0, empty_energy_count):
             energy_group.add(energy_empty)
 
