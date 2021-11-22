@@ -99,15 +99,23 @@ class Character(pg.sprite.Sprite):
                 self.energy += 1
                 self.energy_loading = False
 
-    def update_energy_img(self, energy_group, energy_full, energy_empty):
+    def update_energy_img(self, energy_group, energy_full_list, energy_empty_list, stats_screen):
+
+        for energy in energy_full_list:
+            energy.rect = energy.image.get_rect(center=(stats_screen.get_width() / 1.5, stats_screen.get_height() / 2))
+
+        for energy in energy_empty_list:
+            energy.rect = energy.image.get_rect(center=(stats_screen.get_width() / 1.5, stats_screen.get_height() / 2))
+
         energy_group.empty()
         empty_energy_count = 5 - self.energy
         energy_count = self.energy
         while energy_count > 0:
-            energy_group.add(energy_full)
+            energy_group.add(energy_full_list[energy_count-1])
             energy_count -= 1
-        for energy in range(0, empty_energy_count):
-            energy_group.add(energy_empty)
+        while empty_energy_count > 0:
+            energy_group.add(energy_empty_list[empty_energy_count-1])
+            empty_energy_count -= 1
 
         offset = 80
         offset_counter = 0

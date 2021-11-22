@@ -58,11 +58,15 @@ deathscreen_img = pg.transform.scale(deathscreen_img, (
 
 # create energy sprites
 energy_size = 50
-energy_full = Object(r"src/img/energy.png",
-    stats_screen.get_width() / 2, stats_screen.get_height() / 2, energy_size, energy_size)
-energy_empty = Object(r"src/img/energy_empty.png",
-    stats_screen.get_width() / 2, stats_screen.get_height() / 2, energy_size, energy_size)
 energy_group = pg.sprite.Group()
+energy_full_list = []
+for energy in range(0, 5):
+    energy_full_list.append(Object(r"src/img/energy.png",
+                         stats_screen.get_width() / 2, stats_screen.get_height() / 2, energy_size, energy_size))
+energy_empty_list = []
+for energy in range(0, 5):
+    energy_empty_list.append(Object(r"src/img/energy_empty.png",
+                        stats_screen.get_width() / 2, stats_screen.get_height() / 2, energy_size, energy_size))
 
 
 # enemies
@@ -153,16 +157,10 @@ while running:
 
     # TODO: normalize enemy movement
     # TODO: add stats(score, max score)
-    # TODO: fix energy blit
     # ingame lvl 1
     if game_level == 1:
-        # reset energy rect
-        energy_full.rect = energy_full.image.get_rect(
-            center=(stats_screen.get_width() / 2, stats_screen.get_height() / 2))
-        energy_empty.rect = energy_empty.image.get_rect(
-            center=(stats_screen.get_width() / 2, stats_screen.get_height() / 2))
         char.update_energy()
-        char.update_energy_img(energy_group, energy_full, energy_empty)
+        char.update_energy_img(energy_group, energy_full_list, energy_empty_list, stats_screen)
         # bullet movement and collision
         for bullet in bullet1_group:
             bullet.move()
