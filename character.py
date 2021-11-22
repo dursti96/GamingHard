@@ -20,6 +20,7 @@ class Character(pg.sprite.Sprite):
         self.energy_loading = False
         self.energy_loading_time = 0
         self.score = 0
+        self.new_high_score = False
 
     def update_img_rect(self, screen_height, char_size):
         self.image = pg.transform.scale(self.image_org, (

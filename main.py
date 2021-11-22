@@ -84,28 +84,24 @@ for energy in range(0, 5):
     energy_empty_list.append(Object(r"src/img/energy_empty.png",
                         stats_screen.get_width() / 2, stats_screen.get_height() / 2, energy_size, energy_size))
 
-
 # enemies
 flyman_size = 0.15
 enemy_group = pg.sprite.Group()
 
-pg.init()
-
-# game loop
-running = True
-clock = pg.time.Clock()
-
 
 def upload_score(username):
-    # add score to database
     try:
-
-        mycursor.execute("SELECT Username, High_Score FROM user WHERE Username = '" + username + "'")
+        # select user from db
+        sql = "SELECT Username, High_Score FROM user WHERE Username = %s"
+        val = (username,)
+        mycursor.execute(sql, val)
         myresult = mycursor.fetchall()
+
         # if user already exists, check if new high score
         if len(myresult) > 0:
             for score in myresult:
                 if int(score[1]) < char.score:
+                    char.new_high_score = True
                     sql = "UPDATE user SET High_Score = %s WHERE Username = %s"
                     val = (char.score, username)
                     mycursor.execute(sql, val)
@@ -116,11 +112,18 @@ def upload_score(username):
             val = (username, char.score)
             mycursor.execute(sql, val)
             conn.commit()
-
         return False
     except mysql.connector.errors.Error:
         return True
 
+
+new_high_score = False
+
+pg.init()
+
+# game loop
+running = True
+clock = pg.time.Clock()
 
 while running:
 
@@ -142,10 +145,12 @@ while running:
         if game_level == "dead":
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE or event.key == pg.K_ESCAPE:
-                    # TODO: add username function
+                    # TODO: add username input
                     db_connection_failed = upload_score(username="test")
                     enemy_group.empty()
                     bullet1_group.empty()
+                    if char.new_high_score is True:
+                        new_high_score = True
                     char = Character(standard_pos_x, standard_pos_y, False)
                     char.update_img_rect(screen.get_height(), char_size)
                     char.score = 0
@@ -165,6 +170,7 @@ while running:
                 pos = pg.mouse.get_pos()
                 if button_start_location.collidepoint(pos):
                     game_level = 1
+                    new_high_score = False
                 if button_exit_location.collidepoint(pos):
                     running = False
         # if screen size changes
@@ -213,6 +219,13 @@ while running:
             failed_conn_text_rect = failed_conn_text.get_rect(
                 center=(screen.get_width() / 2, screen.get_height() / 1.1))
             menu_screen.blit(failed_conn_text, failed_conn_text_rect)
+        # if new high score
+        if new_high_score is True:
+            font = pg.font.SysFont('Comic Sans MS', 36)
+            high_score_text = font.render('You have got a new high score!', False, (0, 0, 0))
+            high_score_text_rect = high_score_text.get_rect(
+                center=(screen.get_width() / 2, screen.get_height() / 1.7))
+            menu_screen.blit(high_score_text, high_score_text_rect)
         screen.blit(menu_screen, (0, 0))
 
     # TODO: normalize enemy movement
