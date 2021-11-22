@@ -1,8 +1,24 @@
 import pygame as pg
+import mysql.connector
 
 from character import Character
 from enemy import EnemyFlyman
 from objects import Object
+
+# connect to db
+db_connection_failed = False
+try:
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="gaming_db"
+    )
+    mycursor = conn.cursor()
+
+except mysql.connector.errors.Error:
+    db_connection_failed = True
+
 
 # create full screen surface
 screen = pg.display.set_mode((1200, 800))
@@ -78,6 +94,34 @@ pg.init()
 # game loop
 running = True
 clock = pg.time.Clock()
+
+
+def upload_score(username):
+    # add score to database
+    try:
+
+        mycursor.execute("SELECT Username, High_Score FROM user WHERE Username = '" + username + "'")
+        myresult = mycursor.fetchall()
+        # if user already exists, check if new high score
+        if len(myresult) > 0:
+            for score in myresult:
+                if int(score[1]) < char.score:
+                    sql = "UPDATE user SET High_Score = %s WHERE Username = %s"
+                    val = (char.score, username)
+                    mycursor.execute(sql, val)
+                    conn.commit()
+        # if user doesnt exist, create new user
+        else:
+            sql = "INSERT INTO user (Username, High_score) VALUES (%s, %s)"
+            val = (username, char.score)
+            mycursor.execute(sql, val)
+            conn.commit()
+
+        return False
+    except mysql.connector.errors.Error:
+        return True
+
+
 while running:
 
     # FPS = 30
@@ -98,10 +142,13 @@ while running:
         if game_level == "dead":
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE or event.key == pg.K_ESCAPE:
+                    # TODO: add username function
+                    db_connection_failed = upload_score(username="test")
                     enemy_group.empty()
                     bullet1_group.empty()
                     char = Character(standard_pos_x, standard_pos_y, False)
                     char.update_img_rect(screen.get_height(), char_size)
+                    char.score = 0
                     game_level = 0
         if game_level == 1:
             # character move, shoot bullet
@@ -142,21 +189,34 @@ while running:
         img_rect = deathscreen_img.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2))
         screen.blit(deathscreen_img, img_rect)
         font = pg.font.SysFont('Comic Sans MS', 30)
-        deathscreen_text = font.render('Press "SPACE" to continue.', False, (255, 255, 255))
-        text_rect = deathscreen_text.get_rect(center=(screen.get_width() / 2, screen.get_height() / 1.2))
-        screen.blit(deathscreen_text, text_rect)
+        # deathscreen text
+        deathscreen_text = font.render('Press "SPACE" to continue and save your score.', False, (255, 255, 255))
+        deathsreen_text_rect = deathscreen_text.get_rect(center=(screen.get_width() / 2, screen.get_height() / 1.1))
+        screen.blit(deathscreen_text, deathsreen_text_rect)
+        # deathscreen score
+        deathscreen_score = font.render('Score: ' + str(char.score), False, (255, 255, 255))
+        deathsreen_score_rect = deathscreen_score.get_rect(center=(screen.get_width() / 2, screen.get_height() / 1.2))
+        screen.blit(deathscreen_score, deathsreen_score_rect)
 
     # menu
     if game_level == 0:
+        # blit menu elements
         menu_screen.blit(background_menu_img, (0, 0))
         start_button.move_rect()
         button_start_location = menu_screen.blit(start_button.image, start_button.rect)
         exit_button.move_rect()
         button_exit_location = menu_screen.blit(exit_button.image, exit_button.rect)
+        # if database connection failed
+        if db_connection_failed is True:
+            font = pg.font.SysFont('Comic Sans MS', 30)
+            failed_conn_text = font.render('Error: Connection to Database failed', False, (0, 0, 0))
+            failed_conn_text_rect = failed_conn_text.get_rect(
+                center=(screen.get_width() / 2, screen.get_height() / 1.1))
+            menu_screen.blit(failed_conn_text, failed_conn_text_rect)
         screen.blit(menu_screen, (0, 0))
 
     # TODO: normalize enemy movement
-    # TODO: add stats(score, max score)
+    # TODO: add stats(max score)
     # ingame lvl 1
     if game_level == 1:
         char.update_energy()
