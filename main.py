@@ -14,8 +14,6 @@ try:
         password="",
         database="gaming_db"
     )
-    mycursor = conn.cursor()
-
 except mysql.connector.errors.Error:
     db_connection_failed = True
 
@@ -89,8 +87,10 @@ flyman_size = 0.15
 enemy_group = pg.sprite.Group()
 
 
-def upload_score(username):
+def upload_score(conn, username):
     try:
+        mycursor = conn.cursor()
+
         # select user from db
         sql = "SELECT Username, High_Score FROM user WHERE Username = %s"
         val = (username,)
@@ -146,7 +146,8 @@ while running:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE or event.key == pg.K_ESCAPE:
                     # TODO: add username input
-                    db_connection_failed = upload_score(username="test")
+                    if db_connection_failed is False:
+                        db_connection_failed = upload_score(conn, username="test")
                     enemy_group.empty()
                     bullet1_group.empty()
                     if char.new_high_score is True:
