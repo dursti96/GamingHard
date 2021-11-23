@@ -46,11 +46,12 @@ class InputBox:
                 self.txt_surface = self.font.render(self.text, True, self.color)
 
     def resize(self):
+        # resize input box if text too long
         width = max(200, self.txt_surface.get_width()+10)
         self.rect.w = width
 
     def draw(self, screen):
-        # Blit the text.
-        screen.blit(self.txt_surface, (self.rect.x + self.rect.width / 2 - self.txt_surface.get_width() / 2, self.rect.y + 5))
-        # Blit the rect.
+        # blit text
+        screen.blit(self.txt_surface, (
+            self.rect.x + self.rect.width / 2 - self.txt_surface.get_width() / 2, self.rect.y + 5))
         pg.draw.rect(screen, self.color, self.rect, 2)
