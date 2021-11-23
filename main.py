@@ -3,6 +3,7 @@ import mysql.connector
 
 from character import Character
 from enemy import EnemyFlyman
+from inputbox import InputBox
 from objects import Object
 
 # connect to db
@@ -116,10 +117,16 @@ def upload_score(conn, username):
     except mysql.connector.errors.Error:
         return True
 
-
 new_high_score = False
 
 pg.init()
+
+# Todo
+# input box
+font = pg.font.SysFont('Comic Sans MS', 32)
+input_box_username = InputBox(
+    menu_screen.get_width() / 1.2 - 100, menu_screen.get_height() / 10, 100, 50, font, "username")
+input_boxes = [input_box_username]
 
 # game loop
 running = True
@@ -130,24 +137,14 @@ while running:
     # FPS = 30
     clock.tick(30)
 
-    # if screen size is altered
-    ingame_screen = pg.Surface((screen.get_width(), screen.get_height() / 8 * 7))
-    stats_screen = pg.Surface((screen.get_width(), screen.get_height() / 8))
-    menu_screen = pg.Surface((screen.get_width(), screen.get_height()))
-    screen.fill(background_rgb)
-    ingame_screen.fill(ig_background_rgb)
-    stats_screen.fill(stats_background_rgb)
-    menu_screen.fill(menu_background_rgb)
-
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
         if game_level == "dead":
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE or event.key == pg.K_ESCAPE:
-                    # TODO: add username input
                     if db_connection_failed is False:
-                        db_connection_failed = upload_score(conn, username="test")
+                        db_connection_failed = upload_score(conn, char.name)
                     enemy_group.empty()
                     bullet1_group.empty()
                     if char.new_high_score is True:
@@ -167,6 +164,10 @@ while running:
                 bullet.check_out_of_bounds(bullet1_group, ingame_screen.get_rect())
         # if in menu, and left mouse is clicked, check if click collides with rect of button
         if game_level == 0:
+            # handle input box events
+            for box in input_boxes:
+                box.handle_event(event, char)
+            # hande click on start, exit button
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                 pos = pg.mouse.get_pos()
                 if button_start_location.collidepoint(pos):
@@ -176,6 +177,10 @@ while running:
                     running = False
         # if screen size changes
         if event.type == pg.VIDEORESIZE:
+            # alter screen size
+            ingame_screen = pg.Surface((screen.get_width(), screen.get_height() / 8 * 7))
+            stats_screen = pg.Surface((screen.get_width(), screen.get_height() / 8))
+            menu_screen = pg.Surface((screen.get_width(), screen.get_height()))
             # new char and enemy size
             char.update_img_rect(screen.get_height(), char_size)
             for enemy in enemy_group:
@@ -190,6 +195,16 @@ while running:
             else:
                 background_menu_img = pg.transform.scale(background_menu_img, (
                     screen.get_height() * 2.66, screen.get_height())).convert_alpha()
+            # set input box size
+            for box in input_boxes:
+                box.rect = pg.Rect(menu_screen.get_width() / 1.2 - 100, menu_screen.get_height() / 10, 100, 50)
+
+
+    # fill screen background
+    screen.fill(background_rgb)
+    ingame_screen.fill(ig_background_rgb)
+    stats_screen.fill(stats_background_rgb)
+    menu_screen.fill(menu_background_rgb)
 
     # death screen
     if game_level == "dead":
@@ -213,6 +228,12 @@ while running:
         button_start_location = menu_screen.blit(start_button.image, start_button.rect)
         exit_button.move_rect()
         button_exit_location = menu_screen.blit(exit_button.image, exit_button.rect)
+
+        # input box
+        for box in input_boxes:
+            box.resize()
+            box.draw(menu_screen)
+
         # if database connection failed
         if db_connection_failed is True:
             font = pg.font.SysFont('Comic Sans MS', 30)
@@ -230,7 +251,6 @@ while running:
         screen.blit(menu_screen, (0, 0))
 
     # TODO: normalize enemy movement
-    # TODO: add stats(max score)
     # ingame lvl 1
     if game_level == 1:
         char.update_energy()
@@ -243,7 +263,7 @@ while running:
             for deaths in range(death_count_prior, bullet.death_count):
                 char.score += 100 * (deaths + 1)
         # spawn enemies
-        if len(enemy_group.sprites()) < 5:
+        if len(enemy_group.sprites()) < char.score / 3000 + 4:
             new_enemy = EnemyFlyman()
             new_enemy.update_img_rect(screen.get_height(), flyman_size)
             enemy_group.add(new_enemy)

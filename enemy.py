@@ -54,7 +54,3 @@ class EnemyFlyman(pg.sprite.Sprite):
         elif self.posy > character.posy + 1:
             self.posy -= self.speed
         self.rect.center = (self.posx, self.posy)
-
-
-
-

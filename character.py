@@ -15,12 +15,13 @@ class Character(pg.sprite.Sprite):
         self.direction = direction
         self.posx = posx
         self.posy = posy
-        self.speed = 5
+        self.speed = 6
         self.energy = 5
         self.energy_loading = False
         self.energy_loading_time = 0
         self.score = 0
         self.new_high_score = False
+        self.name = "user"
 
     def update_img_rect(self, screen_height, char_size):
         self.image = pg.transform.scale(self.image_org, (
@@ -91,6 +92,7 @@ class Character(pg.sprite.Sprite):
         return Bullet1(charx, chary, direction)
 
     def update_energy(self):
+        # get 1 energy evergy 30 frames - 1 sek
         if self.energy < 5 and self.energy_loading is False:
             self.energy_loading = True
             self.energy_loading_time = 30
@@ -156,7 +158,6 @@ class Bullet1(pg.sprite.Sprite):
                     if enemy.health <= 0:
                         enemy_group.remove(enemy)
                         self.death_count += 1
-
 
     def check_out_of_bounds(self, bullet1_group, screen_rect):
         if not screen_rect.contains(self.rect):
