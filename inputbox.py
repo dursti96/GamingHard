@@ -17,9 +17,11 @@ class InputBox:
 
     def handle_event(self, event, char):
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-            # if click on inputbox
+            # if click on inputbox, delete text
             if self.rect.collidepoint(event.pos):
                 self.active = True
+                self.text = ""
+                self.txt_surface = self.font.render(self.text, True, self.color)
             else:
                 self.active = False
             # input box change color

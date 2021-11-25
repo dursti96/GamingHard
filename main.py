@@ -92,6 +92,9 @@ def upload_score(conn, username):
     try:
         mycursor = conn.cursor()
 
+        if username == "":
+            username = "username"
+
         # select user from db
         sql = "SELECT Username, High_Score FROM user WHERE Username = %s"
         val = (username,)
@@ -121,11 +124,10 @@ new_high_score = False
 
 pg.init()
 
-# Todo
 # input box
 font = pg.font.SysFont('Comic Sans MS', 32)
 input_box_username = InputBox(
-    menu_screen.get_width() / 1.2 - 100, menu_screen.get_height() / 10, 100, 50, font, "username")
+    menu_screen.get_width() / 1.2 - 100, menu_screen.get_height() / 20, 100, 50, font, "username")
 input_boxes = [input_box_username]
 
 # game loop
@@ -143,13 +145,16 @@ while running:
         if game_level == "dead":
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE or event.key == pg.K_ESCAPE:
+                    # upload score, delete all enemies and bullets, delete char and init new char with same name
                     if db_connection_failed is False:
                         db_connection_failed = upload_score(conn, char.name)
                     enemy_group.empty()
                     bullet1_group.empty()
                     if char.new_high_score is True:
                         new_high_score = True
+                    username_save = char.name
                     char = Character(standard_pos_x, standard_pos_y, False)
+                    char.name = username_save
                     char.update_img_rect(screen.get_height(), char_size)
                     char.score = 0
                     game_level = 0
