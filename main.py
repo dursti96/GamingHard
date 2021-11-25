@@ -33,7 +33,7 @@ menu_background_rgb = (255, 255, 255)
 ingame_screen = pg.Surface((screen.get_width(), screen.get_height() / 8 * 7))
 ig_background_rgb = (255, 255, 255)
 stats_screen = pg.Surface((screen.get_width(), screen.get_height() / 8))
-stats_background_rgb = (230, 230, 230)
+stats_background_rgb = (204, 204, 255)
 
 # game_level 0 == menu, game_level 1 == in level
 game_level = 0
@@ -62,7 +62,7 @@ exit_button.image = pg.transform.scale(exit_button.image, (
     screen.get_width() * 2.1 * exit_button_size, screen.get_width() * exit_button_size)).convert_alpha()
 
 # create menu background image
-background_menu_img = pg.image.load(r"src/img/background_menu.jpg")
+background_menu_img = pg.image.load(r"src/img/background.jpg")
 background_menu_img = pg.transform.scale(background_menu_img, (
     menu_screen.get_height() * 2.66, menu_screen.get_height())).convert_alpha()
 
@@ -70,6 +70,11 @@ background_menu_img = pg.transform.scale(background_menu_img, (
 deathscreen_img = pg.image.load(r"src/img/deathscreen.jpg")
 deathscreen_img = pg.transform.scale(deathscreen_img, (
     menu_screen.get_height() * 1.77, menu_screen.get_height())).convert_alpha()
+
+# create stats screen image
+stats_img = pg.image.load(r"src/img/background.jpg")
+stats_img = pg.transform.scale(stats_img, (
+    menu_screen.get_height() * 2.66, menu_screen.get_height())).convert_alpha()
 
 # create energy sprites
 energy_size = 50
@@ -255,7 +260,6 @@ while running:
             menu_screen.blit(high_score_text, high_score_text_rect)
         screen.blit(menu_screen, (0, 0))
 
-    # TODO: normalize enemy movement
     # ingame lvl 1
     if game_level == 1:
         char.update_energy()
@@ -284,6 +288,11 @@ while running:
         char.check_direction()
         char.move_rect()
 
+        # blit background
+        img_rect = stats_img.get_rect(midtop=(stats_screen.get_width() / 2, 0))
+        stats_screen.blit(background_menu_img, img_rect)
+        img_rect = stats_img.get_rect(midtop=(ingame_screen.get_width() / 2, 0 - stats_screen.get_height()))
+        ingame_screen.blit(background_menu_img, img_rect)
         # blit score
         font = pg.font.SysFont('Comic Sans MS', 32)
         score_text = font.render("Score: " + str(char.score), False, (0, 0, 0))
@@ -299,6 +308,8 @@ while running:
                 ingame_screen.blit(enemy.image_hit, enemy.rect)
                 enemy.hit_status -= 1
         # blit screens
+        stats_rect = pg.Rect(0, 0, ingame_screen.get_width(), 2)
+        pg.draw.rect(ingame_screen, (0, 0, 0), stats_rect, 3)
         ingame_screen.blit(char.image, char.rect)
         screen.blit(ingame_screen, (0, screen.get_height() / 8))
         energy_group.draw(stats_screen)
