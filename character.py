@@ -60,9 +60,21 @@ class Character(pg.sprite.Sprite):
                 self.speed_y = 0
 
     def move_rect(self):
-        self.posx += self.speed_x * self.rect.width / 100
+        self.posx += self.speed_x * self.rect.width / 100 * 1.4
         self.posy += self.speed_y * self.rect.height / 100
-        self.rect.center = (self.posx, self.posy)
+        if self.speed_x > 0:
+            if self.rect.centerx < self.posx - 1:
+                self.rect.center = (self.posx, self.posy)
+        if self.speed_x < 0:
+            if self.rect.centerx > self.posx + 1:
+                self.rect.center = (self.posx, self.posy)
+        if self.speed_y > 0:
+            if self.rect.centery < self.posy - 1:
+                self.rect.center = (self.posx, self.posy)
+        if self.speed_y < 0:
+            if self.rect.centery > self.posy + 1:
+                self.rect.center = (self.posx, self.posy)
+
 
     def check_direction(self):
         # face right direction; False == face right, True == face left

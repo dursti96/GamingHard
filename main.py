@@ -72,9 +72,11 @@ deathscreen_img = pg.transform.scale(deathscreen_img, (
     menu_screen.get_height() * 1.77, menu_screen.get_height())).convert_alpha()
 
 # create stats screen image
-stats_img = pg.image.load(r"src/img/background.jpg")
-stats_img = pg.transform.scale(stats_img, (
+ingame_img = pg.image.load(r"src/img/background.jpg")
+ingame_img = pg.transform.scale(ingame_img, (
     menu_screen.get_height() * 2.66, menu_screen.get_height())).convert_alpha()
+
+stats_rect = pg.Rect(0, 0, ingame_screen.get_width(), 2)
 
 # create energy sprites
 energy_size = 50
@@ -289,9 +291,9 @@ while running:
         char.move_rect()
 
         # blit background
-        img_rect = stats_img.get_rect(midtop=(stats_screen.get_width() / 2, 0))
+        img_rect = ingame_img.get_rect(midtop=(stats_screen.get_width() / 2, 0))
         stats_screen.blit(background_menu_img, img_rect)
-        img_rect = stats_img.get_rect(midtop=(ingame_screen.get_width() / 2, 0 - stats_screen.get_height()))
+        img_rect = ingame_img.get_rect(midtop=(ingame_screen.get_width() / 2, 0 - stats_screen.get_height()))
         ingame_screen.blit(background_menu_img, img_rect)
         # blit score
         font = pg.font.SysFont('Comic Sans MS', 32)
@@ -308,7 +310,6 @@ while running:
                 ingame_screen.blit(enemy.image_hit, enemy.rect)
                 enemy.hit_status -= 1
         # blit screens
-        stats_rect = pg.Rect(0, 0, ingame_screen.get_width(), 2)
         pg.draw.rect(ingame_screen, (0, 0, 0), stats_rect, 3)
         ingame_screen.blit(char.image, char.rect)
         screen.blit(ingame_screen, (0, screen.get_height() / 8))
